@@ -1,0 +1,43 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security"  
+ xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+ xsi:schemaLocation="http://www.springframework.org/schema/beans  
+ http://www.springframework.org/schema/beans/spring-beans-3.2.xsd  
+ http://www.springframework.org/schema/security  
+ http://www.springframework.org/schema/security/spring-security-3.2.xsd">  
+  
+
+<http use-expressions="true" auto-config="false"
+        entry-point-ref="restAuthenticationEntryPoint" authentication-manager-ref="authenticationManager">
+
+<custom-filter ref="restFilter" position="PRE_AUTH_FILTER" />
+  
+     <intercept-url pattern="/**" access="isAuthenticated()"/>
+ 
+     <http-basic />
+</http>
+
+<authentication-manager alias="authenticationManager">
+     <authentication-provider>
+         <user-service>
+              <user name="test" password="test123" authorities="ROLE_USER" />
+           
+              </user-service>
+     </authentication-provider>
+</authentication-manager>
+
+ <beans:bean id="restAuthenticationEntryPoint" class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint"/>
+
+  <beans:bean id="restFilter" class="com.passage.manipulation.filter.CustomAuthenticationFilter">
+   <beans:property name="authenticationManager" ref="authenticationManager" />
+   <beans:property name="authenticationSuccessHandler" ref="mySuccessHandler"/>
+    <beans:property name="AuthenticationFailureHandler" ref="failureHandler"/>
+ 
+  </beans:bean>
+
+  <beans:bean id="mySuccessHandler" class="com.passage.manipulation.filter.CustomAuthenticationSuccessHandler"/>
+ 
+<beans:bean id="failureHandler"
+      class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+    <beans:property name="defaultFailureUrl" value="/accessdenied.action"/>
+</beans:bean>
+</beans:beans> 
